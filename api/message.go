@@ -100,7 +100,11 @@ func HandleMessagesRequest(c *gin.Context) {
 		if val, ok := qstrings["limit"]; ok {
 			i, err := strconv.Atoi(strings.ToLower(strings.TrimSpace(val[0])))
 			if err == nil {
-				limit = i
+				// Control for sensible values, negative values passed to
+				// db as a limit will cause an exception
+				if i > 0 && i < 10000 {
+					limit = i
+				}
 			}
 		}
 		/* DEBUG
