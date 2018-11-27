@@ -27,6 +27,14 @@ func InsertUserRecord(obj *datatypes.MsgrUserJSON) error {
 
 	if err != nil {
 		log.Printf("Error inserting user record -> %s", err.Error())
+		if IsConstraintViolation(err) {
+			is_dup, msg := IsDuplicateKeyViolation(err)
+			if is_dup {
+				return &DatastoreError{msg, ErrorConstraintViolation}
+			}
+			// Handle the db constraint error
+			return &DatastoreError{ErrorConstraintViolationString, ErrorConstraintViolation}
+		}
 		return err
 	}
 

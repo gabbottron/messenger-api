@@ -42,7 +42,8 @@ func AddHealthCheckRoutes(r *gin.Engine) *gin.Engine {
 }
 
 func AddAdditionalRoutes(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) *gin.Engine {
-	//r = AddUserRoutes(r, authMiddleware)
+	r = AddUserRoutes(r, authMiddleware)
+	r = AddMessageRoutes(r, authMiddleware)
 
 	return r
 }
