@@ -2,7 +2,7 @@ package datastore
 
 import (
 	//"database/sql"
-	//"errors"
+	"errors"
 	"fmt"
 	"github.com/gabbottron/messenger-api/src/datatypes"
 	"log"
@@ -19,6 +19,16 @@ const (
 		(messageid, messagetext) 
 		VALUES($1, $2)
 		RETURNING messagetext`
+
+	InsertMessageImageQuery string = `INSERT INTO message_image 
+		(messageid, imageuri, imagetype) 
+		VALUES($1, $2, $3)
+		RETURNING imageuri, imagetype`
+
+	InsertMessageVideoQuery string = `INSERT INTO message_video 
+		(messageid, videouri, videoencoding, videolength) 
+		VALUES($1, $2, $3, $4)
+		RETURNING videouri, videoencoding, videolength`
 
 	// In case we want to see a full conversation...
 	SelectMessagesQuery string = `SELECT m.messageid, mt.messagetext, mi.imageuri 
@@ -37,17 +47,6 @@ const (
 		ORDER BY m.createdate ASC
 		LIMIT $4;`
 )
-
-/*
-
-type MessageJSON struct {
-	MessageID      int                 `json:"id"`
-	Timestamp      *time.Time          `json:"timestamp,omitempty"`
-	SenderID       int                 `json:"sender" binding:"required"`
-	RecipientID    int                 `json:"recipient" binding:"required"`
-	MessageContent *MessageContentJSON `json:"content" binding:"required"`
-}
-*/
 
 func GetMessages(sender int, recipient int, start int, limit int) ([]datatypes.MessageJSON, error) {
 	results := make([]datatypes.MessageJSON, 0)
@@ -131,10 +130,41 @@ func InsertMessageRecord(obj *datatypes.MessageJSON) error {
 		}
 	case "image":
 		fmt.Println("image")
+		err = db.QueryRow(InsertMessageImageQuery, obj.MessageID, obj.MessageContent.MessageImageURI, obj.MessageContent.MessageImageType).Scan(&obj.MessageContent.MessageImageURI, &obj.MessageContent.MessageImageType)
+
+		if err != nil {
+			log.Printf("Insert message image: QueryRow.Scan() -> %s", err.Error())
+
+			if IsConstraintViolation(err) {
+				is_dup, msg := IsDuplicateKeyViolation(err)
+				if is_dup {
+					return &DatastoreError{msg, ErrorConstraintViolation}
+				}
+				// Handle the db constraint error
+				return &DatastoreError{ErrorConstraintViolationString, ErrorConstraintViolation}
+			}
+			return err
+		}
 	case "video":
 		fmt.Println("video")
+		err = db.QueryRow(InsertMessageVideoQuery, obj.MessageID, obj.MessageContent.MessageVideoURI, obj.MessageContent.MessageVideoEncoding, obj.MessageContent.MessageVideoLength).Scan(&obj.MessageContent.MessageVideoURI, &obj.MessageContent.MessageVideoEncoding, &obj.MessageContent.MessageVideoLength)
+
+		if err != nil {
+			log.Printf("Insert message image: QueryRow.Scan() -> %s", err.Error())
+
+			if IsConstraintViolation(err) {
+				is_dup, msg := IsDuplicateKeyViolation(err)
+				if is_dup {
+					return &DatastoreError{msg, ErrorConstraintViolation}
+				}
+				// Handle the db constraint error
+				return &DatastoreError{ErrorConstraintViolationString, ErrorConstraintViolation}
+			}
+			return err
+		}
 	default:
 		fmt.Println("unknown type!")
+		return errors.New("Unknown message type!")
 	}
 
 	return nil
