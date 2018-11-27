@@ -12,33 +12,16 @@ type MessageJSON struct {
 	MessageContent *MessageContentJSON `json:"content" binding:"required"`
 }
 
-/*
-type MessageTextJSON struct {
-	MessageText *string `json:"messageText"`
-}
-
-type MessageImageJSON struct {
-	MessageImageURI  *string `json:"messageImageUri"`
-	MessageImageType *string `json:"messageImageType"`
-}
-
-type MessageVideoJSON struct {
-	MessageVideoURI      *string `json:"messageVideoUri"`
-	MessageVideoEncoding *string `json:"messageVideoEncoding"`
-	MessageVideoLength   *int    `json:"messageVideoLength"`
-}
-*/
-
 type MessageContentJSON struct {
 	MessageContentID *int    `json:"messageContentId,omitempty"`
 	MessageType      *string `json:"type" binding:"required"`
 	// -- Text message fields
 	MessageText *string `json:"text,omitempty"`
 	// -- Image fields
-	MessageImageURI  *string `json:"messageImageUri,omitempty"`
-	MessageImageType *string `json:"messageImageType,omitempty"`
+	MessageImageURI  *string `json:"imageUri,omitempty"`
+	MessageImageType *string `json:"imageType,omitempty"`
 	// -- Video fields
-	MessageVideoURI      *string `json:"messageVideoUri,omitempty"`
-	MessageVideoEncoding *string `json:"messageVideoEncoding,omitempty"`
-	MessageVideoLength   *int    `json:"messageVideoLength,omitempty"`
+	MessageVideoURI      *string `json:"videoUri,omitempty"`
+	MessageVideoEncoding *string `json:"encoding,omitempty"`
+	MessageVideoLength   *int    `json:"length,omitempty"`
 }

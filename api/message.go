@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gabbottron/gin-jwt"
 	"github.com/gabbottron/messenger-api/src/datastore"
 	"github.com/gabbottron/messenger-api/src/datatypes"
@@ -35,10 +34,7 @@ func HandleMessageCreateRequest(c *gin.Context) {
 	// Set the sender ID based on the validated ID in the claim
 	messageData.SenderID = claim_userid
 
-	fmt.Println("Printing message data:")
-	fmt.Println(messageData)
-
-	// LEFT OFF HERE ----------
+	// Attempt to insert the message
 	err = datastore.InsertMessageRecord(&messageData)
 	if err != nil {
 		log.Printf("Create message -> datastore.InsertMessageRecord() returned an error:  %s", err.Error())
@@ -107,11 +103,11 @@ func HandleMessagesRequest(c *gin.Context) {
 				limit = i
 			}
 		}
-		/*
-			fmt.Println("Keys passed in from querystring:")
-			for k, v := range qstrings {
-				fmt.Printf("key[%s] value[%s]\n", k, v)
-			} */
+		/* DEBUG
+		fmt.Println("Keys passed in from querystring:")
+		for k, v := range qstrings {
+			fmt.Printf("key[%s] value[%s]\n", k, v)
+		} */
 	} else {
 		// There are 2 required querystring params
 		ReplyUnprocessableEntity(c, "This route requires querystring params (recipient, start)!")

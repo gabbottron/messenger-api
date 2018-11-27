@@ -3,7 +3,6 @@ package datastore
 import (
 	//"database/sql"
 	"errors"
-	"fmt"
 	"github.com/gabbottron/messenger-api/src/datatypes"
 	"log"
 	"strconv"
@@ -31,7 +30,7 @@ const (
 		RETURNING videouri, videoencoding, videolength`
 
 	// In case we want to see a full conversation...
-	SelectMessagesQuery string = `SELECT m.messageid, mt.messagetext, mi.imageuri 
+	SelectMessagesQuery string = `SELECT m.messageid, mt.messagetext, mi.imageuri, mi.imagetype
 		FROM message AS m 
 		LEFT JOIN message_text AS mt ON mt.messageid = m.messageid 
 		LEFT JOIN message_image AS mi ON mi.messageid = m.messageid 
@@ -39,10 +38,12 @@ const (
 		ORDER BY m.createdate ASC;`
 
 	SelectMessagesToRecipientQuery string = `SELECT m.messageid, m.createdate, 
-		m.senderid, m.recipientid, m.messagecontenttype, mt.messagetext, mi.imageuri 
+		m.senderid, m.recipientid, m.messagecontenttype, mt.messagetext, mi.imageuri, 
+		mi.imagetype, mv.videouri, mv.videoencoding, mv.videolength   
 		FROM message AS m 
 		LEFT JOIN message_text AS mt ON mt.messageid = m.messageid 
-		LEFT JOIN message_image AS mi ON mi.messageid = m.messageid 
+		LEFT JOIN message_image AS mi ON mi.messageid = m.messageid
+		LEFT JOIN message_video AS mv ON mv.messageid = m.messageid 
 		WHERE m.senderid = $1 AND m.recipientid = $2 AND m.messageid >= $3
 		ORDER BY m.createdate ASC
 		LIMIT $4;`
@@ -63,7 +64,9 @@ func GetMessages(sender int, recipient int, start int, limit int) ([]datatypes.M
 		obj.MessageContent = new(datatypes.MessageContentJSON)
 		err = rows.Scan(&obj.MessageID, &obj.Timestamp, &obj.SenderID, &obj.RecipientID,
 			&obj.MessageContent.MessageType, &obj.MessageContent.MessageText,
-			&obj.MessageContent.MessageImageURI)
+			&obj.MessageContent.MessageImageURI, &obj.MessageContent.MessageImageType,
+			&obj.MessageContent.MessageVideoURI, &obj.MessageContent.MessageVideoEncoding,
+			&obj.MessageContent.MessageVideoLength)
 
 		// If the scan was successful, load the row
 		if err == nil {
@@ -89,8 +92,6 @@ func InsertMessageRecord(obj *datatypes.MessageJSON) error {
 	// TODO: Should wrap these queries in a transaction probably, in case
 	//       the content type insert fails!
 
-	log.Println("Insert message record...")
-
 	// attempt to insert the new message record
 	err := db.QueryRow(InsertMessageQuery, obj.SenderID, obj.RecipientID, obj.MessageContent.MessageType).Scan(
 		&obj.MessageID, &obj.SenderID, &obj.RecipientID, &obj.MessageContent.MessageType, &obj.Timestamp)
@@ -112,7 +113,7 @@ func InsertMessageRecord(obj *datatypes.MessageJSON) error {
 	// Now insert the correct content type
 	switch *obj.MessageContent.MessageType {
 	case "text":
-		fmt.Println("text")
+		//log.Println("Content type: text")
 		err = db.QueryRow(InsertMessageTextQuery, obj.MessageID, obj.MessageContent.MessageText).Scan(&obj.MessageContent.MessageText)
 
 		if err != nil {
@@ -129,7 +130,7 @@ func InsertMessageRecord(obj *datatypes.MessageJSON) error {
 			return err
 		}
 	case "image":
-		fmt.Println("image")
+		//log.Println("Content type: image")
 		err = db.QueryRow(InsertMessageImageQuery, obj.MessageID, obj.MessageContent.MessageImageURI, obj.MessageContent.MessageImageType).Scan(&obj.MessageContent.MessageImageURI, &obj.MessageContent.MessageImageType)
 
 		if err != nil {
@@ -146,7 +147,7 @@ func InsertMessageRecord(obj *datatypes.MessageJSON) error {
 			return err
 		}
 	case "video":
-		fmt.Println("video")
+		//log.Println("Content type: video")
 		err = db.QueryRow(InsertMessageVideoQuery, obj.MessageID, obj.MessageContent.MessageVideoURI, obj.MessageContent.MessageVideoEncoding, obj.MessageContent.MessageVideoLength).Scan(&obj.MessageContent.MessageVideoURI, &obj.MessageContent.MessageVideoEncoding, &obj.MessageContent.MessageVideoLength)
 
 		if err != nil {
@@ -163,7 +164,7 @@ func InsertMessageRecord(obj *datatypes.MessageJSON) error {
 			return err
 		}
 	default:
-		fmt.Println("unknown type!")
+		log.Println("unknown type!")
 		return errors.New("Unknown message type!")
 	}
 
