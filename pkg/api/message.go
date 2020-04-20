@@ -1,9 +1,10 @@
 package api
 
 import (
-	"github.com/gabbottron/gin-jwt"
-	"github.com/gabbottron/messenger-api/src/datastore"
-	"github.com/gabbottron/messenger-api/src/datatypes"
+	//jwt "github.com/gabbottron/gin-jwt"
+	"github.com/gabbottron/messenger-api/pkg/jwt"
+	"github.com/gabbottron/messenger-api/pkg/datastore"
+	"github.com/gabbottron/messenger-api/pkg/datatypes"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"

@@ -3,9 +3,10 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gabbottron/gin-jwt"
-	"github.com/gabbottron/messenger-api/src/datastore"
-	"github.com/gabbottron/messenger-api/src/datatypes"
+	//jwt "github.com/gabbottron/gin-jwt"
+	"github.com/gabbottron/messenger-api/pkg/jwt"
+	"github.com/gabbottron/messenger-api/pkg/datastore"
+	"github.com/gabbottron/messenger-api/pkg/datatypes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
@@ -55,7 +56,7 @@ func (suite *ApiTestSuite) SetupTest() {
 
 	if !suite.Env_loaded {
 		//fmt.Println("Loading ENV...")
-		err := godotenv.Load("../.env")
+		err := godotenv.Load("../../.env")
 		assert.Nil(suite.T(), err, "ENV load should return no errors")
 		if err == nil {
 			suite.Env_loaded = true
