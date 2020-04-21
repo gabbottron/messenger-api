@@ -3,7 +3,7 @@ package datastore
 import (
 	"database/sql"
 	"errors"
-	"github.com/gabbottron/messenger-api/src/datatypes"
+	"github.com/gabbottron/messenger-api/pkg/datatypes"
 	"log"
 )
 

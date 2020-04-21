@@ -1,32 +1,37 @@
 # messenger-api
 This is a basic message app
 
-After checkout
-- Run dep init / dep ensure
-- Create a .env file and fill it out
+**REQUIREMENTS**
+- You must have [Docker](https://www.docker.com/) installed and running
+- You must have a .env file in project root (see below)
+- You should have the [database running](https://github.com/gabbottron/messenger-db)
 
-.env file should look like this:
+## Standard dev configuration (.env file)
 ```
 APP_ENV=local-development
 APP_ENDPOINT=http://localhost:3000
 
-PORT=8083
+PORT=8080
 
 POSTGRES_DB_USER=msgr
 POSTGRES_DB_PASSWORD={{YOUR_PASSWORD_HERE}}
 
 DB_NAME=msgr
-DB_PORT=5439
-DB_HOSTNAME=127.0.0.1
+DB_PORT=5432
+DB_HOSTNAME=messenger-db
 ```
 
-go run main.go
+## To start in a container (config comes from .env)
+make up
 
-To run the tests with a clean database it can be helpful to use a run_tests script:
-```
-#!/bin/bash
+## To run locally on host (default config in makefile)
+make run-local
 
-psql -h 127.0.0.1 -p 5439 -U msgr -f /...path-to-db-repo.../messenger-db/sql/drop_all_tables.sql
-psql -h 127.0.0.1 -p 5439 -U msgr -f /...path-to-db-repo.../messenger-db/sql/init_db.sql
-psql -h 127.0.0.1 -p 5439 -U msgr -f /...path-to-db-repo.../messenger-db/sql/fixtures.sql
-```
+## To run locally and supply different API port
+PORT=8089 make run-local
+
+## To run all tests locally
+make test-local
+
+## To run all tests locally and override DB port
+DB_PORT=5438 make test-local

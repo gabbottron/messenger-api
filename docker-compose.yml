@@ -1,0 +1,30 @@
+version: '3.5'
+
+services:
+  api:
+    container_name: ${PROJECT_NAME}_api
+    build:
+      args:
+        PROJECT_NAME: ${PROJECT_NAME}
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - project_net
+    ports:
+      - '8080:8080'
+    external_links:
+      - ${PROJECT_NAME}-db
+    environment:
+      - APP_ENV=development
+      - APP_ENDPOINT
+      - POSTGRES_DB_USER
+      - POSTGRES_DB_PASSWORD
+      - DB_NAME
+      - DB_HOSTNAME=${PROJECT_NAME}-db
+      - DB_PORT
+    command: ./${PROJECT_NAME}-api
+
+networks:
+  project_net:
+    external:
+      name: ${PROJECT_NAME}_net
