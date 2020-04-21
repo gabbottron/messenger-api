@@ -94,7 +94,7 @@ logs-prod: check_docker
 # utility commands
 purge: check_docker
 	@PROJECT_NAME=$(PROJECT_NAME) docker-compose down
-	@docker rmi $(DOCKER_API_IMAGE)
+	@docker rmi --force $(DOCKER_API_IMAGE)
 
 # Local development convenience targets
 connect:
