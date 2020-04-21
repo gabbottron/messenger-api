@@ -1,9 +1,10 @@
 # messenger-api
 This is a basic message app
 
-REQUIREMENTS
-- You must have Docker installed
+**REQUIREMENTS**
+- You must have [Docker](https://www.docker.com/) installed and running
 - You must have a .env file in project root (see below)
+- You should have the [database running](https://github.com/gabbottron/messenger-db)
 
 ## Standard dev configuration (.env file)
 ```
