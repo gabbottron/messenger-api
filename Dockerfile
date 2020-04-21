@@ -16,5 +16,3 @@ RUN apk --no-cache add ca-certificates
 RUN apk --no-cache add postgresql-client
 WORKDIR /app/
 COPY --from=build-stage /wrk/${PROJECT_NAME}-api/bin/${PROJECT_NAME}-api .
-
-#ENTRYPOINT ["./${PROJECT_NAME}-api"]
