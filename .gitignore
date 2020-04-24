@@ -3,5 +3,5 @@
 vendor/
 .secrets/
 
-messenger-api
+bin/
 _vendor-*
